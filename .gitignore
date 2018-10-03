@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+client-credentials.js
+node_modules
+
+# IDE project files
+.idea
+*.bak
+*.bbprojectd/
+*.sublime-project
+*.sublime-workspace
