@@ -27,6 +27,7 @@
 
 <!-- The Viewer JS -->
 <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/6.*/viewer3D.min.js"></script>
+<script src="forge-viewer-room-shader.js"></script>
 
 <!-- Developer JS -->
 <script>
@@ -91,7 +92,8 @@
   let documentId = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6cGxubW9kZWxzL05pam1lZ2VuX3BsYXlncm91bmRfMjAxOV9TcGFjZXNPbi5ud2M';
   let options = {
     env: 'AutodeskProduction',
-    accessToken: ''
+    accessToken: '',
+    extensions: ['RoomShaderExtension']
   };
 
   vueHttp(HOST + AUTH_PATH).get().then((data) => {
@@ -106,7 +108,6 @@
    * Proceeds with model initialization.
    */
   function onDocumentLoadSuccess(doc) {
-
     // A document contains references to 3D and 2D geometries.
     var geometries = doc.getRoot().search({'type': 'geometry'});
     if (geometries.length === 0) {
@@ -148,6 +149,9 @@
     console.log('onLoadModelSuccess()!');
     console.log('Validate model loaded: ' + (viewer.model === model));
     console.log(model);
+    viewer.loadExtension('RoomShaderExtension').then((ext) => {
+      console.log(ext)
+    });
 
 
     viewer.impl.setViewFromCamera(viewer.model.getData().cameras[1]);
@@ -156,6 +160,7 @@
       viewer.isolate(dbArr);
       viewer.select(3819);
       viewer.fitToView(dbArr);
+
       // const color = new THREE.Vector4( 255 / 255, 0, 0, 1 );
       // viewer.setThemingColor(3819,color);
 
@@ -167,18 +172,18 @@
     }, 2000);
 
 
-    viewer.search('Rooms', (data) => {
-      data.forEach((elem) => {
-        viewer.getProperties(elem, (res) => {
-          let find = res.properties.filter((item) => {
-            return item.displayName === 'Type' && item.displayValue === 'Rooms';
-          });
-          if (find.length) {
-            console.log(res)
-          }
-        });
-      })
-    });
+    // viewer.search('Rooms', (data) => {
+    //   data.forEach((elem) => {
+    //     viewer.getProperties(elem, (res) => {
+    //       let find = res.properties.filter((item) => {
+    //         return item.displayName === 'Type' && item.displayValue === 'Rooms';
+    //       });
+    //       if (find.length) {
+    //         console.log(res)
+    //       }
+    //     });
+    //   })
+    // });
   }
 
   /**
@@ -188,59 +193,6 @@
   function onLoadModelError(viewerErrorCode) {
     console.error('onLoadModelError() - errorCode:' + viewerErrorCode);
   }
-
-  function addMesh () {
-
-    // const geometry = new THREE.BoxGeometry(
-    //   Math.random() * 10 + 5.0,
-    //   Math.random() * 10 + 5.0,
-    //   Math.random() * 10 + 5.0);
-    //
-    const geometry = new THREE.BoxGeometry(
-      100,
-      20,
-      50);
-
-    const color = Math.floor(Math.random() * 16777215);
-
-    const material = this.createColorMaterial(color);
-
-    const mesh = new THREE.Mesh(geometry, material);
-
-    mesh.position.x = -50 + Math.random() * 100;
-    mesh.position.y = -50 + Math.random() * 100;
-    mesh.position.z = -50 + Math.random() * 100;
-
-    mesh.position.x = 100;
-    mesh.position.y = 100;
-    mesh.position.z = 100;
-
-    viewer.impl.scene.add(mesh);
-
-    viewer.impl.sceneUpdated(true);
-
-    return mesh
-  };
-
-  function createColorMaterial(color) {
-
-    const material = new THREE.MeshPhongMaterial({
-      specular: new THREE.Color(color),
-      side: THREE.DoubleSide,
-      reflectivity: 0.0,
-      color
-    })
-
-    const materials = this.viewer.impl.getMaterials()
-
-    materials.addMaterial(
-      color.toString(16),
-      material,
-      true)
-
-    return material
-  };
-
 
 
 </script>
