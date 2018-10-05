@@ -89,7 +89,10 @@
   const AUTH_PATH = '/getAccessToken';
 
   let viewer;
+  // navis
   let documentId = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6cGxubW9kZWxzL05pam1lZ2VuX3BsYXlncm91bmRfMjAxOV9TcGFjZXNPbi5ud2M';
+  // revit
+  // let documentId = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6cGxubW9kZWxzL05pam1lZ2VuX3BsYXlncm91bmRfMjAxOV9TcGFjZXMucnZ0';
   let options = {
     env: 'AutodeskProduction',
     accessToken: '',
@@ -107,7 +110,35 @@
    * Autodesk.Viewing.Document.load() success callback.
    * Proceeds with model initialization.
    */
+  function view(nr) {
+    let doc = window.doc;
+    let roles = ['3d', '2d'];
+    const rootItem = doc.getRootItem();
+    let items = [];
+    const roleArray = roles
+      ? (Array.isArray(roles) ? roles : [roles])
+      : [];
+    roleArray.forEach((role) => {
+
+      items = [ ...items,
+        ...Autodesk.Viewing.Document.getSubItemsWithProperties(
+          rootItem, { type: 'geometry', role }, true) ]
+    });
+
+    console.log(items);
+
+    viewer.tearDown()
+
+    viewer.start()
+
+    const path =
+      doc.getViewablePath(items[nr]);
+    console.log(path)
+    viewer.loadModel(path)
+  }
+
   function onDocumentLoadSuccess(doc) {
+    window.doc = doc;
     // A document contains references to 3D and 2D geometries.
     var geometries = doc.getRoot().search({'type': 'geometry'});
     if (geometries.length === 0) {
